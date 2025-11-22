@@ -94,6 +94,7 @@ function analyzeSalesData(data, options) {
         }
         return (record) => {
             seller.sales_count += 1;
+            seller.revenue += record.total_amount;
         };
     };
 
@@ -105,7 +106,6 @@ function analyzeSalesData(data, options) {
             const product = productIndex[item.sku];
             const cost = product.purchase_price * item.quantity;
             const revenue = calculateSimpleRevenue(item);
-            seller.revenue += revenue;
             const profit = revenue - cost;
             seller.profit += profit;
             if (!seller.products_sold[item.sku]) {

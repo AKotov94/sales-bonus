@@ -94,7 +94,6 @@ function analyzeSalesData(data, options) {
         }
         return (record) => {
             seller.sales_count += 1;
-            seller.revenue += record.total_amount;
         };
     };
 
@@ -102,11 +101,11 @@ function analyzeSalesData(data, options) {
         const seller = sellerIndex[record.seller_id];
         const updateSeller = createSellerUpdater(seller);
         updateSeller(record);
-        
         record.items.forEach(item => {
             const product = productIndex[item.sku];
             const cost = product.purchase_price * item.quantity;
             const revenue = calculateSimpleRevenue(item);
+            seller.revenue += revenue;
             const profit = revenue - cost;
             seller.profit += profit;
             if (!seller.products_sold[item.sku]) {
@@ -118,6 +117,7 @@ function analyzeSalesData(data, options) {
 
     // @TODO: Сортировка продавцов по прибыли
     sellerStats.sort((a, b) => b.profit - a.profit);
+    console.log(sellerStats);
 
     // @TODO: Назначение премий на основе ранжирования
     sellerStats.forEach((seller, index) => {

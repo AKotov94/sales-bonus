@@ -79,9 +79,10 @@ function analyzeSalesData(data, options) {
     const productIndex = Object.fromEntries(data.products.map(item => [item.sku, item]));
 
     // @TODO: Расчет выручки и прибыли для каждого продавца
-    const createSellerUpdater = (seller) => {
+    data.purchase_records.forEach(record => {
+        const seller = sellerIndex[record.seller_id];
         if (!seller.sales_count) {
-            seller.sales_count = 0;
+            seller.sales_count = 0
         }
         if (!seller.revenue) {
             seller.revenue = 0;
@@ -90,18 +91,11 @@ function analyzeSalesData(data, options) {
             seller.profit = 0;
         }
         if (!seller.products_sold) {
-            seller.products_sold = {};
+            seller.products_sold = {}
         }
-        return (record) => {
-            seller.sales_count += 1;
-            seller.revenue += record.total_amount;
-        };
-    };
+        seller.sales_count += 1;
+        seller.revenue += record.total_amount;
 
-    data.purchase_records.forEach(record => {
-        const seller = sellerIndex[record.seller_id];
-        const updateSeller = createSellerUpdater(seller);
-        updateSeller(record);
         record.items.forEach(item => {
             const product = productIndex[item.sku];
             const cost = product.purchase_price * item.quantity;
